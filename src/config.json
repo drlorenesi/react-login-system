@@ -1,0 +1,6 @@
+{
+  "apiEndpoint1": "https://jsonplaceholder.typicode.com/",
+  "apiEndpoint": "https://api-template.onrender.com/api",
+  "apiEndpoint2": "http://localhost:9000/api",
+  "cacheMins": 10
+}
