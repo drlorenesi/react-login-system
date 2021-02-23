@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadMovies } from '../redux/slices/moviesSlice';
+import { loadMovies, addMovie, updateMovie } from '../redux/slices/moviesSlice';
 import { loadGenres } from '../redux/slices/genresSlice';
 import Loader from '../common/Loader';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { formatDec } from '../utils/formatNumber';
 
 function MovieForm(props) {
   const dispatch = useDispatch();
@@ -14,20 +15,36 @@ function MovieForm(props) {
 
   const movieId = props.match.params.id;
 
+  const saveShortcut = (e) => {
+    if (
+      (window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) &&
+      e.keyCode === 83
+    ) {
+      e.preventDefault();
+      console.log('Saved!');
+      document.getElementById('submitButton').click();
+    }
+  };
+
   useEffect(() => {
+    window.addEventListener('keydown', saveShortcut);
     dispatch(loadGenres());
     if (movieId === 'new') {
       return;
     }
     dispatch(loadMovies());
+    // cleanup event listener on unmount
+    return () => {
+      window.removeEventListener('keydown', saveShortcut);
+    };
   }, [dispatch, movieId]);
 
   const schema = yup.object().shape({
     movieId: yup.string(),
-    title: yup.string().min(2).required('Required!'),
+    title: yup.string().min(1).required('Required!'),
     genreId: yup.string().required('Required'),
-    // numberInStock: yup.number().min(0).max(100).required('Required!'),
-    // dailyRentalRate: yup.number().min(0).max(10).required('Required!'),
+    numberInStock: yup.number().min(0).max(100).required('Required!'),
+    dailyRentalRate: yup.number().min(0).max(10).required('Required!'),
   });
 
   const { register, handleSubmit, errors, formState } = useForm({
@@ -36,14 +53,32 @@ function MovieForm(props) {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
-    // dispatch(addMovie(data));
-    // console.log(`Movie ${id} saved.`);
+    if (movieId === 'new') {
+      dispatch(addMovie(data));
+    } else {
+      dispatch(updateMovie(parseInt(movieId, 10), data));
+    }
+    props.history.push('/movies');
+  };
+
+  const goBack = () => {
     props.history.push('/movies');
   };
 
   // Movie Form
-  function renderForm(movie) {
+  function renderForm(data) {
+    const mapToViewModel = (data) => {
+      return {
+        id: data.movie_id,
+        title: data.title,
+        genreId: data.genre_id,
+        numberInStock: data.number_in_stock,
+        dailyRentalRate: data.daily_rental_rate,
+      };
+    };
+
+    const movie = data ? mapToViewModel(data) : null;
+
     return (
       <React.Fragment>
         <div className='col-6 my-3'>
@@ -55,6 +90,7 @@ function MovieForm(props) {
             <fieldset className='border p-3'>
               <legend>Movie Details</legend>
               {/* Title */}
+              {/* ----- */}
               <div className='mb-3'>
                 <label className='form-label'>Title:</label>
                 <input
@@ -71,14 +107,16 @@ function MovieForm(props) {
                 )}
               </div>
               {/* Genre */}
+              {/* ----- */}
               <div className='mb-3'>
                 <label className='form-label'>Genre:</label>
                 <select
                   name='genreId'
                   className='form-select'
-                  defaultValue={movie ? movie.genre_id : null}
+                  defaultValue={movie ? movie.genreId : null}
                   ref={register}
                 >
+                  {/* Note: this info is loaded from loadGenres() */}
                   <option value=''>- Select a genre -</option>
                   {genres.list.map((genre) => (
                     <option key={genre.genre_id} value={genre.genre_id}>
@@ -87,8 +125,52 @@ function MovieForm(props) {
                   ))}
                 </select>
               </div>
+              {/* Number in Stock */}
+              {/* --------------- */}
+              <div className='mb-3'>
+                <label className='form-label'>Number in Stock:</label>
+                <input
+                  name='numberInStock'
+                  type='text'
+                  className={
+                    errors.numberInStock
+                      ? 'form-control is-invalid'
+                      : 'form-control'
+                  }
+                  defaultValue={movie ? movie.numberInStock : null}
+                  ref={register}
+                />
+                {errors.numberInStock && (
+                  <div className='invalid-feedback'>
+                    {errors.numberInStock.message}
+                  </div>
+                )}
+              </div>
+              {/* Daily Rental Rate */}
+              {/* ----------------- */}
+              <div className='mb-3'>
+                <label className='form-label'>Daily Rental Rate:</label>
+                <input
+                  name='dailyRentalRate'
+                  type='text'
+                  className={
+                    errors.dailyRentalRate
+                      ? 'form-control is-invalid'
+                      : 'form-control'
+                  }
+                  defaultValue={movie ? formatDec(movie.dailyRentalRate) : null}
+                  ref={register}
+                />
+                {errors.dailyRentalRate && (
+                  <div className='invalid-feedback'>
+                    {errors.dailyRentalRate.message}
+                  </div>
+                )}
+              </div>
               {/* Submit */}
+              {/* ------ */}
               <button
+                id='submitButton'
                 type='submit'
                 disabled={!formState.isValid}
                 className='btn btn-primary'
@@ -99,11 +181,7 @@ function MovieForm(props) {
           </form>
         </div>
         <hr />
-        <button
-          className='btn btn-outline-primary mr-2'
-          // Not working after clicking "back" from new product
-          onClick={props.history.goBack}
-        >
+        <button className='btn btn-outline-primary mr-2' onClick={goBack}>
           &laquo; Back
         </button>
       </React.Fragment>
@@ -111,6 +189,7 @@ function MovieForm(props) {
   }
 
   // Main Render Function
+  // --------------------
   if (movieId === 'new') {
     return renderForm(null);
   }

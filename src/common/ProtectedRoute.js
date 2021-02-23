@@ -11,16 +11,20 @@ function ProtectedRoute({
 }) {
   const user = decodedAuthToken();
 
-  return (
-    <Route
-      {...rest}
-      render={(props) => {
-        access.includes(user.roleId);
-        if (!access.includes(user.roleId)) return <Redirect to='/' />;
-        return Component ? <Component {...props} /> : render(props);
-      }}
-    />
-  );
+  if (decodedAuthToken()) {
+    return (
+      <Route
+        {...rest}
+        render={(props) => {
+          access.includes(user.roleId);
+          if (!access.includes(user.roleId)) return <Redirect to='/' />;
+          return Component ? <Component {...props} /> : render(props);
+        }}
+      />
+    );
+  } else {
+    <Redirect to='/login' />;
+  }
 }
 
 export default ProtectedRoute;

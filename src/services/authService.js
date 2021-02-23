@@ -26,8 +26,8 @@ export const getAuthToken = () => {
       return localStorage.getItem(tokenKey);
     } else {
       localStorage.removeItem(tokenKey);
-      return null;
       // window.location = '/login';
+      return null;
     }
   } catch (err) {
     return null;

@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from '@reduxjs/toolkit';
 import { apiCallBegan } from '../middleware/api';
 import getFromCache from '../../utils/getFromCache';
-// import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const initialState = {
   loading: false,
@@ -29,22 +29,29 @@ const moviesSlice = createSlice({
     },
     movieAdded: (state, action) => {
       state.list.push(action.payload.data);
-      // toast.success('Movie added!');
+      toast.info('Movie added!', {
+        autoClose: 2000,
+      });
     },
     movieDeleted: (state, action) => {
       state.list.splice(action.payload, 1);
-      // toast.success('Movie Deleted!');
+      toast.info('Movie deleted!', {
+        autoClose: 2000,
+      });
     },
     movieUpdated: (state, action) => {
       const { index, data } = action.payload;
-      state.list[index].name = data.name;
-      state.list[index].email = data.email;
-      state.list[index].website = data.website;
-      // toast.success('Movie updated!');
+      state.list[index].title = data.title;
+      state.list[index].genre_id = data.genreId;
+      state.list[index].number_in_stock = data.numberInStock;
+      state.list[index].daily_rental_rate = data.dailyRentalRate;
     },
     crudRequestFailed: (state, action) => {
       state.list = action.reset;
-      // toast.error('Could not complete the operation.');
+      toast.error('Could not complete the operation.');
+    },
+    addMovieRequestFailed: (state, action) => {
+      toast.error('Could not complete the operation.');
     },
   },
 });
@@ -57,6 +64,7 @@ export const {
   movieUpdated,
   movieDeleted,
   crudRequestFailed,
+  addMovieRequestFailed,
 } = moviesSlice.actions;
 
 export default moviesSlice.reducer;
@@ -86,12 +94,13 @@ export const addMovie = (data) =>
     method: 'post',
     data: data,
     onSuccess: movieAdded.type,
+    onError: addMovieRequestFailed.type,
   });
 
 // UPDATE A MOVIE (optimistic update)
 export const updateMovie = (id, data) => (dispatch, getState) => {
   const movies = getState().movies.list;
-  const index = movies.findIndex((movie) => movie.id === id);
+  const index = movies.findIndex((movie) => movie.movie_id === id);
   dispatch(movieUpdated({ index, data }));
 
   return dispatch(
