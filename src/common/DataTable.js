@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-import _ from "lodash";
-import Pagination from "./tableComponents/Pagination";
-import Table from "./tableComponents/Table";
-import ShowEntries from "./tableComponents/ShowEntries";
-import SearchBox from "./tableComponents/SearchBox";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import Pagination from './tableComponents/Pagination';
+import Table from './tableComponents/Table';
+import ShowEntries from './tableComponents/ShowEntries';
+import SearchBox from './tableComponents/SearchBox';
 
-function DataTable({ tableColumns, tableData }) {
+function DataTable({ tableColumns, tableData, id }) {
   // Set initial Table properties here
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [sortColumn, setSortColumn] = useState({
-    column: "title",
-    order: "asc"
+    column: 'title',
+    order: 'asc',
   });
 
   const handlePageSize = (input) => {
@@ -30,7 +30,7 @@ function DataTable({ tableColumns, tableData }) {
     setCurrentPage(1);
   };
   const handleClearQuery = () => {
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   // Helper Methods
@@ -84,24 +84,25 @@ function DataTable({ tableColumns, tableData }) {
         </div>
       ) : (
         <div>
-          <div className="row">
-            <div className="col-4">
+          <div className='row'>
+            <div className='col-4'>
               <ShowEntries
                 displaySize={handlePageSize}
                 allEntries={tableData.length}
                 clearQuery={handleClearQuery}
               />
             </div>
-            <div className="col-4 ml-auto">
+            <div className='col-4 ml-auto'>
               <SearchBox value={searchQuery} onChange={handleSearch} />
             </div>
           </div>
-          <div className="table-responsive">
+          <div className='table-responsive'>
             <Table
               tableColumns={tableColumns}
               tableData={pagedData}
               sortColumn={sortColumn}
               onSort={handleSort}
+              id={id}
             />
           </div>
           <Pagination
@@ -118,7 +119,7 @@ function DataTable({ tableColumns, tableData }) {
 
 DataTable.propTypes = {
   tableColumns: PropTypes.array.isRequired,
-  tableData: PropTypes.array.isRequired
+  tableData: PropTypes.array.isRequired,
 };
 
 export default DataTable;

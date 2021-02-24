@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadMovies, deleteMovie } from '../redux/slices/moviesSlice';
 import { loadGenres } from '../redux/slices/genresSlice';
+import DataTable from '../common/DataTable';
 import Loader from '../common/Loader';
-import { formatDec } from '../utils/formatNumber';
 
 function Home() {
   const dispatch = useDispatch();
@@ -15,6 +15,42 @@ function Home() {
     dispatch(loadMovies());
     dispatch(loadGenres());
   }, [dispatch]);
+
+  const columns = [
+    {
+      accessor: 'title',
+      label: 'Title',
+    },
+    {
+      accessor: 'genre_id',
+      label: 'Genre',
+    },
+    {
+      accessor: 'number_in_stock',
+      label: 'Stock',
+      dataAlign: 'right',
+      type: 'int',
+    },
+    {
+      accessor: 'daily_rental_rate',
+      label: 'Rate',
+      dataAlign: 'right',
+      type: 'decimal',
+    },
+    {
+      accessor: 'delete',
+      label: 'Actions',
+      dataAlign: 'center',
+      cell: (user) => (
+        <button
+          className='btn btn-sm btn-danger'
+          onClick={() => handleDelete(user)}
+        >
+          Delete
+        </button>
+      ),
+    },
+  ];
 
   const getGenreName = (id) => {
     return genres.list.filter((genre) => genre.genre_id === parseInt(id, 10))[0]
@@ -32,40 +68,11 @@ function Home() {
         <Link to='/movies/new' type='button' className='btn btn-primary mb-2'>
           Add Movie
         </Link>
-        <div className='table-responsive'>
-          <table className='table table-bordered table-striped table-sm'>
-            <thead>
-              <tr>
-                <th scope='col'>Title</th>
-                <th scope='col'>Genre</th>
-                <th scope='col'>Number in Stock</th>
-                <th scope='col'>Daily Rental Rate</th>
-                <th scope='col'>Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {movies.list.map((movie) => (
-                <tr key={movie.movie_id}>
-                  <td>
-                    <Link to={`/movies/${movie.movie_id}`}>{movie.title}</Link>
-                  </td>
-                  <td>{getGenreName(movie.genre_id)}</td>
-                  <td>{movie.number_in_stock}</td>
-                  <td>{formatDec(movie.daily_rental_rate)}</td>
-                  <td>
-                    <button
-                      type='button'
-                      className='btn btn-sm btn-danger'
-                      onClick={() => handleDelete(movie.movie_id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          tableColumns={columns}
+          tableData={movies.list}
+          id={'movie_id'}
+        />
       </React.Fragment>
     );
   } else if (movies.loadingError) {
