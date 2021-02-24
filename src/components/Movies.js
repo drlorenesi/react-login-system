@@ -20,6 +20,7 @@ function Home() {
     {
       accessor: 'title',
       label: 'Title',
+      cell: () => <div>Test</div>,
     },
     {
       accessor: 'genre_id',
