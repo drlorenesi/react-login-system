@@ -15,28 +15,12 @@ function MovieForm(props) {
 
   const movieId = props.match.params.id;
 
-  const saveShortcut = (e) => {
-    if (
-      (window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) &&
-      e.keyCode === 83
-    ) {
-      e.preventDefault();
-      console.log('Saved!');
-      document.getElementById('submitButton').click();
-    }
-  };
-
   useEffect(() => {
-    window.addEventListener('keydown', saveShortcut);
     dispatch(loadGenres());
     if (movieId === 'new') {
       return;
     }
     dispatch(loadMovies());
-    // cleanup event listener on unmount
-    return () => {
-      window.removeEventListener('keydown', saveShortcut);
-    };
   }, [dispatch, movieId]);
 
   const schema = yup.object().shape({

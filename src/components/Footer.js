@@ -1,22 +1,22 @@
 import React from 'react';
-import { FaGithub } from 'react-icons/fa';
+import { Github } from 'react-bootstrap-icons';
 
 function Footer() {
   return (
-    <footer className="main-footer container-fluid">
-      <div className="container-fluid">
-        <div className="row text-center">
+    <footer className='main-footer container-fluid'>
+      <div className='container-fluid'>
+        <div className='row text-center'>
           <p>
             &copy; {new Date().getFullYear()} COMPANY | and some other legal
             stuff.
           </p>
           <p>
             <a
-              href="https://github.com/drlorenesi"
-              target="_blank"
-              rel="noopener noreferrer"
+              href='https://github.com/drlorenesi'
+              target='_blank'
+              rel='noopener noreferrer'
             >
-              <FaGithub size="1.5em" />
+              <Github size='1.5em' />
             </a>
           </p>
         </div>

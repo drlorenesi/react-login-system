@@ -3,7 +3,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { formatDec } from '../../utils/formatNumber';
 
-function TableBody({ tableData, tableColumns, id }) {
+function TableBody({ tableData, tableColumns, keyId }) {
   const alignCell = (dataAlign) => {
     return {
       textAlign: dataAlign,
@@ -28,7 +28,7 @@ function TableBody({ tableData, tableColumns, id }) {
         tableData.map((item) => (
           // Need to pass in a unique key
           // ---------------------------
-          <tr key={item[id]}>
+          <tr key={item[keyId]}>
             {tableColumns.map((column) => (
               <td key={column.accessor} style={alignCell(column.dataAlign)}>
                 {renderCell(item, column)}

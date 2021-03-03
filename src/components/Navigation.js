@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { removeAuthToken } from '../services/authService';
-import { FaHome } from 'react-icons/fa';
+import { HouseFill } from 'react-bootstrap-icons';
 
 function Navigation({ user }) {
   const handleLogout = () => {
@@ -13,19 +13,19 @@ function Navigation({ user }) {
     <div className='shadow-sm bg-white rounded'>
       <nav className='navbar navbar-expand-sm navbar-light bg-light'>
         <div className='container-fluid'>
-          <Link className='navbar-brand' to='/'>
-            <FaHome />
+          <Link className='navbar-brand ' to='/'>
+            <HouseFill />
           </Link>
           <button
             className='navbar-toggler'
             type='button'
-            data-toggle='collapse'
-            data-target='#navbarNav'
+            data-bs-toggle='collapse'
+            data-bs-target='#navbarSupportedContent'
           >
             <span className='navbar-toggler-icon'></span>
           </button>
-          <div className='collapse navbar-collapse' id='navbarNav'>
-            <ul className='navbar-nav'>
+          <div className='collapse navbar-collapse' id='navbarSupportedContent'>
+            <ul className='navbar-nav me-auto '>
               <li className='nav-item'>
                 <NavLink className='nav-link' to='/products'>
                   Products
@@ -39,15 +39,14 @@ function Navigation({ user }) {
                 </li>
               )}
             </ul>
-            {user.firstName && (
-              <ul className='navbar-nav ml-auto'>
-                <li className='nav-item'>
-                  <NavLink className='nav-link' to='/account'>
-                    {user.firstName} {user.lastName}
-                  </NavLink>
-                </li>
-              </ul>
-            )}
+            {/* Right aligned Menu Items */}
+            <ul className='navbar-nav ml-auto'>
+              <li className='nav-item'>
+                <NavLink className='nav-link' to='/account'>
+                  {user.firstName} {user.lastName}
+                </NavLink>
+              </li>
+            </ul>
             <button
               type='button'
               className='btn btn-primary'

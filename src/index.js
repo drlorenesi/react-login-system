@@ -5,7 +5,7 @@ import App from './App';
 // Redux
 import { Provider } from 'react-redux';
 import store from './redux/store';
-// Bootstrap (working with version 5.0.0-alpha3)
+// Bootstrap (working with version 5.0.0-beta2)
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
 // WebVitals

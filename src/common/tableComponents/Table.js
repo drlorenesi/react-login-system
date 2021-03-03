@@ -4,7 +4,7 @@ import TableHeader from './TableHeader';
 import TableBody from './TableBody';
 import TableFooter from './TableFooter';
 
-function Table({ tableColumns, tableData, sortColumn, onSort, id }) {
+function Table({ tableColumns, tableData, sortColumn, onSort, keyId }) {
   return (
     <div className='table-responsive'>
       <table className='table table-sm align-middle table-striped table-hover table-bordered'>
@@ -13,7 +13,11 @@ function Table({ tableColumns, tableData, sortColumn, onSort, id }) {
           sortColumn={sortColumn}
           onSort={onSort}
         />
-        <TableBody tableData={tableData} tableColumns={tableColumns} id={id} />
+        <TableBody
+          tableData={tableData}
+          tableColumns={tableColumns}
+          keyId={keyId}
+        />
         <TableFooter tableData={tableData} tableColumns={tableColumns} />
       </table>
     </div>

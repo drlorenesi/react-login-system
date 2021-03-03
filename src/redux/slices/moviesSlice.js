@@ -1,11 +1,10 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { apiCallBegan } from '../middleware/api';
 import getFromCache from '../../utils/getFromCache';
 import { toast } from 'react-toastify';
 
 const initialState = {
-  loading: false,
-  loadingError: false,
+  requestError: null,
   list: [],
   lastFetch: null,
 };
@@ -14,31 +13,28 @@ const moviesSlice = createSlice({
   name: 'movies',
   initialState,
   reducers: {
-    moviesRequested: (state, action) => {
-      state.loading = true;
-    },
-    moviesRequestFailed: (state, action) => {
-      state.loading = false;
-      state.loadingError =
-        'Cannot process your request at this time. Please try again later.';
-    },
+    // Load Movies
     moviesReceived: (state, action) => {
-      state.loading = false;
       state.list = action.payload.data;
       state.lastFetch = Date.now();
     },
+    moviesRequestFailed: (state, action) => {
+      state.requestError =
+        'Cannot process your request at this time. Please try again later.';
+    },
+    // Add a Movie
     movieAdded: (state, action) => {
       state.list.push(action.payload.data);
-      toast.info('Movie added!', {
+      toast.success('Movie added!', {
         autoClose: 2000,
       });
     },
-    movieDeleted: (state, action) => {
-      state.list.splice(action.payload, 1);
-      toast.info('Movie deleted!', {
+    movieAddedFailed: (state, action) => {
+      toast.error('There was an error processing your request.', {
         autoClose: 2000,
       });
     },
+    // Update a Movie
     movieUpdated: (state, action) => {
       const { index, data } = action.payload;
       state.list[index].title = data.title;
@@ -46,25 +42,39 @@ const moviesSlice = createSlice({
       state.list[index].number_in_stock = data.numberInStock;
       state.list[index].daily_rental_rate = data.dailyRentalRate;
     },
-    crudRequestFailed: (state, action) => {
+    movieUpdatedFailed: (state, action) => {
       state.list = action.reset;
-      toast.error('Could not complete the operation.');
+      toast.error('There was an error processing your request.', {
+        autoClose: 2000,
+      });
     },
-    addMovieRequestFailed: (state, action) => {
-      toast.error('Could not complete the operation.');
+    // Delete a Movie
+    movieDeleted: (state, action) => {
+      state.list.splice(action.payload, 1);
+    },
+    movieDeletedSuccess: (state, action) => {
+      toast.success('Movie deleted!', {
+        autoClose: 2000,
+      });
+    },
+    movieDeletedFailed: (state, action) => {
+      toast.error('There was an error processing your request.', {
+        autoClose: 2000,
+      });
     },
   },
 });
 
 export const {
-  moviesRequested,
-  moviesRequestFailed,
   moviesReceived,
+  moviesRequestFailed,
   movieAdded,
+  movieAddedFailed,
   movieUpdated,
+  movieUpdatedFailed,
   movieDeleted,
-  crudRequestFailed,
-  addMovieRequestFailed,
+  movieDeletedSuccess,
+  movieDeletedFailed,
 } = moviesSlice.actions;
 
 export default moviesSlice.reducer;
@@ -79,7 +89,6 @@ export const loadMovies = () => (dispatch, getState) => {
       url: '/movies',
       method: 'get',
       data: null,
-      onStart: moviesRequested.type,
       onSuccess: moviesReceived.type,
       onError: moviesRequestFailed.type,
     })
@@ -94,7 +103,7 @@ export const addMovie = (data) =>
     method: 'post',
     data: data,
     onSuccess: movieAdded.type,
-    onError: addMovieRequestFailed.type,
+    onError: movieAddedFailed.type,
   });
 
 // UPDATE A MOVIE (optimistic update)
@@ -109,7 +118,7 @@ export const updateMovie = (id, data) => (dispatch, getState) => {
       method: 'put',
       data: data,
       initialState: movies,
-      onError: crudRequestFailed.type,
+      onError: movieUpdatedFailed.type,
     })
   );
 };
@@ -124,8 +133,8 @@ export const deleteMovie = (id) => (dispatch, getState) => {
     apiCallBegan({
       url: '/movies/' + id,
       method: 'delete',
-      initialState: movies,
-      onError: crudRequestFailed.type,
+      onSuccess: movieDeletedSuccess.type,
+      onError: movieDeletedFailed.type,
     })
   );
 };

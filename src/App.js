@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { decodedAuthToken } from './services/authService';
+import Modal from 'react-modal';
+import { useIdleTimer } from 'react-idle-timer';
+import {
+  decodedAuthToken,
+  getAuthToken,
+  removeAuthToken,
+} from './services/authService';
 import ProtectedRoute from './common/ProtectedRoute';
 import Navigation from './components/Navigation';
 import Movies from './components/Movies';
@@ -17,11 +23,37 @@ import NotFound from './components/NotFound';
 
 import './styles.css';
 import 'react-toastify/dist/ReactToastify.css';
+import LogoutModal from './common/LogoutModal';
 
 toast.configure();
+Modal.setAppElement('#root');
 
 export default function App() {
   const [user, setUser] = useState({ loggedIn: false });
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const handleOnIdle = () => {
+    if (!getAuthToken()) return null;
+    setModalIsOpen(true);
+    // console.log('last active', getLastActiveTime());
+    // removeAuthToken();
+    // window.location = '/login';
+  };
+
+  const handleLogout = () => {
+    console.log('Signed out.');
+    setModalIsOpen(false);
+  };
+
+  const handleStayConnected = () => {
+    console.log('Connection kept alive.');
+    setModalIsOpen(false);
+  };
+
+  const { getLastActiveTime } = useIdleTimer({
+    timeout: 5000,
+    onIdle: handleOnIdle,
+  });
 
   useEffect(() => {
     if (decodedAuthToken()) {
@@ -32,6 +64,11 @@ export default function App() {
   if (decodedAuthToken()) {
     return (
       <React.Fragment>
+        <LogoutModal
+          isOpen={modalIsOpen}
+          logout={handleLogout}
+          stayConnected={handleStayConnected}
+        />
         <div className='page-container'>
           <div className='content-wrap'>
             <Navigation user={user} />

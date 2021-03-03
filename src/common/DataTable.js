@@ -6,7 +6,7 @@ import Table from './tableComponents/Table';
 import ShowEntries from './tableComponents/ShowEntries';
 import SearchBox from './tableComponents/SearchBox';
 
-function DataTable({ tableColumns, tableData, id }) {
+function DataTable({ tableColumns, tableData, keyId }) {
   // Set initial Table properties here
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,7 +92,7 @@ function DataTable({ tableColumns, tableData, id }) {
                 clearQuery={handleClearQuery}
               />
             </div>
-            <div className='col-4 ml-auto'>
+            <div className='col-4 ms-auto'>
               <SearchBox value={searchQuery} onChange={handleSearch} />
             </div>
           </div>
@@ -102,7 +102,7 @@ function DataTable({ tableColumns, tableData, id }) {
               tableData={pagedData}
               sortColumn={sortColumn}
               onSort={handleSort}
-              id={id}
+              keyId={keyId}
             />
           </div>
           <Pagination

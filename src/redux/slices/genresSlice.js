@@ -3,8 +3,7 @@ import { apiCallBegan } from '../middleware/api';
 import getFromCache from '../../utils/getFromCache';
 
 const initialState = {
-  loading: false,
-  loadingError: false,
+  requestError: false,
   list: [],
   lastFetch: null,
 };
@@ -13,27 +12,19 @@ const genresSlice = createSlice({
   name: 'genres',
   initialState,
   reducers: {
-    genresRequested: (state, action) => {
-      state.loading = true;
-    },
+    // Load Genres
     genresReceived: (state, action) => {
-      state.loading = false;
       state.list = action.payload.data;
       state.lastFetch = Date.now();
     },
     genresRequestFailed: (state, action) => {
-      state.loading = false;
-      state.loadingError =
+      state.requestError =
         'Cannot process your request at this time. Please try again later.';
     },
   },
 });
 
-export const {
-  genresRequested,
-  genresReceived,
-  genresRequestFailed,
-} = genresSlice.actions;
+export const { genresReceived, genresRequestFailed } = genresSlice.actions;
 
 export default genresSlice.reducer;
 
@@ -47,7 +38,6 @@ export const loadGenres = () => (dispatch, getState) => {
       url: '/genres',
       method: 'get',
       data: null,
-      onStart: genresRequested.type,
       onSuccess: genresReceived.type,
       onError: genresRequestFailed.type,
     })

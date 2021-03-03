@@ -1,6 +1,6 @@
-export const formatDec = (num) => {
-  return new Intl.NumberFormat([], {
+export const formatDec = (number) => {
+  return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(num);
+  }).format(number);
 };
